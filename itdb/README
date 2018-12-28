@@ -1,0 +1,9 @@
+Usage:
+
+# loop over text files to be converted contained in folder input, convert them in integer IDs and 
+# save converted files in folder ouput
+./msgDecoder.py -d -i input -o output    (or python msgDecoder.py -d -i input -o output)
+
+
+# read input_file_name convert it in integer IDs and save in output_file_name
+./msgDecoder.py -i input_file -o output_file    (or python msgDcoder.py -i input_file_name -o output_file_name)
