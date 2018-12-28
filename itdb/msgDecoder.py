@@ -49,12 +49,13 @@ def convert( ifile, ofile ):
        result = result.replace(c," ")
 
    result = result.replace("'"," ").replace("-"," ").replace("“"," ").replace("”"," ").replace("â","a")
-   result = result.replace("à","a").replace("á","a").replace("à","a")
-   result = result.replace("è","e").replace("é","e").replace("è","e").replace("é","e").replace("è","e")
-   result = result.replace("ì","i").replace("í","i").replace("ì","i")
-   result = result.replace("ò","o").replace("ó","o").replace("ò","o")
-   result = result.replace("ù","u").replace("ú","u").replace("ù","u")
+   result = result.replace("à","a").replace("á","a").replace("à","a")
+   result = result.replace("è","e").replace("é","e").replace("è","e").replace("é","e").replace("è","e")
+   result = result.replace("ì","i").replace("í","i").replace("ì","i")
+   result = result.replace("ò","o").replace("ó","o").replace("ò","o")
+   result = result.replace("ù","u").replace("ú","u").replace("ù","u")
 
+   words = word_tokenize(result)
    for i in words:
       skypch = (
        i == " " or i == "," or i == ":" or i == "." or i == "," or i == "(" or i == ")" or i == ";" or
