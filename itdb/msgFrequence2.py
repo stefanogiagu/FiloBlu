@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Stefano Giagu'
 __email__ = 'stefano.giagu@roma1.infn.it'
-__version__ = '1.3.0'
+__version__ = '1.1.0'
 __status__ = 'prod'
 #
 # usage: ./msgDecoder.py -i input -o output
@@ -14,30 +14,14 @@ import os, sys
 import string
 import numpy as np
 
-# command line args
-import argparse
-parser = argparse.ArgumentParser(description='msgDecoder.py: txt msg to integer ids conversion.')
-print (__author__)
-print (__version__)
-parser.add_argument('-d',action='store_true',default=False, dest='directory',help='if present interpret as dirs the following args', required=False)
-parser.add_argument('-i','--input', help='Input file or dir',required=True)
-parser.add_argument('-o','--output',help='Output file or dir', required=True)
-args = parser.parse_args()
-
-# input and output file names
-## show values ##
-if args.directory:
-   print ("Input dir: %s" % args.input )
-   print ("Output dir: %s" % args.output )
-else:
-   print ("Input file: %s" % args.input )
-   print ("Output file: %s" % args.output )
-idir=args.input
-odir=args.output
+conteggi = {}
 
 # conversion algorithm
-def convert( ifile, ofile ):
-   convertita = [];
+def convert( ifile ):
+   global conteggi
+   convertita = []
+
+   
 
    filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 
@@ -94,20 +78,18 @@ def convert( ifile, ofile ):
 
         if trovata > 0:
            convertita.append(tmp_idx)
-           print(i+' id: '+tmp_idx)
+           conteggi[tmp_idx] = conteggi[tmp_idx]+1
+           f3.write(i+' id: '+tmp_idx+'\n')
         else:
            tmp_idx = 0
            convertita.append(tmp_idx)
-           print(i+' NON TROVATA')
+           conteggi[tmp_idx] = conteggi[tmp_idx]+1
+           f3.write(i+' NON TROVATA\n')
 
    outvect = np.asarray(convertita).astype('i4') 
    print(outvect)
 
-   #save converted vector
-   f=open(ofile,'w')
-   for ele in convertita:
-      f.write(ele+' ')
-   f.close()
+   print(conteggi[0], ' : Conteggi 0')
 
    return
 
@@ -117,10 +99,11 @@ nltk.download('punkt')
 from nltk.tokenize import word_tokenize 
 
 # Import and Load Italian Words + ID DB
+conteggi[0] = 0
 parole = []
 paroleX = []
 indici = []
-with open('DB/DB_parole_uniche_IT_withID_fsorted.dat', encoding='utf-8') as f:
+with open('DB/DB_parole_uniche_IT_withID.dat', encoding='utf-8') as f:
    for line in f:
       fields = line.split()
       parole.append(fields[0])
@@ -129,17 +112,21 @@ with open('DB/DB_parole_uniche_IT_withID_fsorted.dat', encoding='utf-8') as f:
       paroleX.append(xp[0:xl-1])
       indici.append(fields[1])
       #print(fields[0], '  ', fields[1])
+      conteggi[fields[1]] = 0
 f.close()
 
-# Conversion algorithm
-if args.directory:
-  import os
-  for filename in os.listdir(idir):
-     print("file: %s" % filename)
-     print("file: %s" % os.path.splitext(filename)[0])
-     ifile= idir+"/"+filename
-     ofile= odir+"/"+os.path.splitext(filename)[0]+".dat"
+#print(parole.index('zuzzerellona'))
+#print(indici[parole.index('zuzzerellona')])
+f3=open('risultatiNEW.dat','w')
 
-     convert(ifile, ofile)
-else:
-  convert(idir,odir)
+convert('corpus_HouseMD_stefano.txt')
+
+f3.close()
+f2=open('frequenze.dat','w')
+
+with open('DB/DB_parole_uniche_IT_withID.dat', encoding='utf-8') as f:
+   for line in f:
+      fields = line.split()
+      f2.write(fields[0]+'  '+fields[1]+'  '+str(conteggi[fields[1]])+'\n')
+f.close()
+f2.close()
