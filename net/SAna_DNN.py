@@ -86,8 +86,8 @@ def vectorize_sequences(sequences, dimension=10000):
 # 0 used for any unknown word), labels are sentiment wrt the given text and are encoded as 0 or 1.
 # Encode vectors in one-hot
 #
-# NOTE: assumes the input vectors contain only the first most frequent MAX_WORDS (ID=3 means 3rd most frequent 
-#       word (done at the level of the preparartyion of the Italian dictonary-ID file)
+# NOTE: assumes the input vectors have ID sorted in word freq. (example: ID=3 means 3rd most frequent 
+#       word
 # 
 # NOTE: this implementation uses either one-hot encoding or word embedding layer 
 #       (ToDo: use pretrained word embedding) to map words into the geometric space used by the CNN
@@ -104,8 +104,9 @@ def load_data(inp_file='db_data.npz'):
        #
        npzf = np.load(inp_file)
        npzf.files
-       msgs = npzf['msgs']
+       msgs_uncut = npzf['msgs']
        labels = npzf['labels']
+       msgs = [[w for w in x if w<=MAX_WORDS] for x in msgs_uncut]
 
     label = np.asarray(labels).astype('float32') 
 
@@ -115,7 +116,8 @@ def load_data(inp_file='db_data.npz'):
     print(label.shape, 'label sample')
 
     if USE_EMBEDDING == True:
-       # transform data in input pads (samples x time) for word embedding
+       # transform data in input pads (samples x time) for word embedding 
+       # Sequences that are shorter than MAX_LENGTH are padded to MAX_LENGHT, sequqnces longer are truncated
        data = sequence.pad_sequences(msgs, maxlen=MAX_LENGTH)
     else:
        # encode in one-hot data

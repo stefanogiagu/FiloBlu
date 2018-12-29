@@ -100,8 +100,9 @@ def load_data(inp_file='db_data.npz'):
        #
        npzf = np.load(inp_file)
        npzf.files
-       msgs = npzf['msgs']
+       msgs_uncut = npzf['msgs']
        labels = npzf['labels']
+       msgs = [[w for w in x if w<=MAX_WORDS] for x in msgs_uncut]
 
     #label = np.asarray(labels).astype('float32') 
 
